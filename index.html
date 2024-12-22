@@ -152,29 +152,27 @@
                 title: 'IP Lookup',
                 description: 'Enter an IP address to check location, security, and proxy status.',
                 error: 'Failed to lookup IP address. Please try again.'
-            },
-            es: {
-                title: 'Búsqueda de IP',
-                description: 'Ingrese una dirección IP para verificar ubicación, seguridad y estado del proxy.',
-                error: 'Error al buscar la dirección IP. Inténtalo de nuevo.'
-            },
-            fr: {
-                title: 'Recherche IP',
-                description: 'Entrez une adresse IP pour vérifier l’emplacement, la sécurité et l’état du proxy.',
-                error: 'Échec de la recherche de l’adresse IP. Veuillez réessayer.'
-            },
-            de: {
-                title: 'IP-Suche',
-                description: 'Geben Sie eine IP-Adresse ein, um Standort, Sicherheit und Proxy-Status zu überprüfen.',
-                error: 'IP-Adresse konnte nicht abgerufen werden. Bitte versuchen Sie es erneut.'
             }
         };
 
-        function changeLanguage() {
-            const lang = document.getElementById('language').value;
-            const t = translations[lang];
-            document.getElementById('title').textContent = t.title;
-            document.getElementById('description').textContent = t.description;
+        document.getElementById('ipForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const ip = document.getElementById('ipInput').value;
+            const resultDiv = document.getElementById('result');
+            try {
+                const response = await fetch(`http://ipapi.co/${ip}/json/`);
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <h2>IP Address: ${data.ip}</h2>
+                    <p><strong>Country:</strong> ${data.country_name}</p>
+                    <p><strong>City:</strong> ${data.city}</p>
+                    <p><strong>ISP:</strong> ${data.org}</p>
+                    <p><strong>Postal Code:</strong> ${data.postal}</p>
+                `;
+                document.getElementById('map').src = `http://www.google.com/maps?q=${data.latitude},${data.longitude}&z=12&output=embed`;
+            } catch (error) {
+                resultDiv.innerHTML = `<p>${translations[document.getElementById('language').value].error}</p>`;
+            }
         }
     </script>
 </body>
